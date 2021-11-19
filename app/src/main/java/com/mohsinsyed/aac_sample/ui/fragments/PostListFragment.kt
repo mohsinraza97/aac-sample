@@ -5,13 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mohsinsyed.aac_sample.R
@@ -30,7 +26,8 @@ class PostListFragment : Fragment() {
     private val postAdapter by lazy {
         PostAdapter(
             requireContext(),
-            ::onPostClicked,
+            postViewModel.posts.value as ArrayList<Post>?,
+            onPostClicked = ::onPostClicked,
             onEditClicked = ::onEditClicked,
             onDeleteClicked = ::onDeleteClicked
         )
@@ -74,12 +71,12 @@ class PostListFragment : Fragment() {
             if (binding?.swipeRefresh?.isRefreshing == true) {
                 binding?.swipeRefresh?.isRefreshing = false
             }
-            postAdapter.submitList(it)
+            postAdapter.updateList(it as? ArrayList<Post>?)
         })
         postViewModel.events.observe(viewLifecycleOwner, { event ->
             when (event) {
                 is PostViewModel.PostEvents.Deleted -> {
-                    postAdapter.removePost(deletedPostPosition) {
+                    postAdapter.removeItem(deletedPostPosition) {
                         if (it) {
                             binding?.root?.showSnackBar(getString(R.string.post_action_message, "deleted"))
                         }

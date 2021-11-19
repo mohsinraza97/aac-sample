@@ -3,34 +3,42 @@ package com.mohsinsyed.aac_sample.ui.adapters
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.mohsinsyed.aac_sample.data.entities.Post
 import com.mohsinsyed.aac_sample.databinding.ItemPostBinding
 
 class PostAdapter(
     private val context: Context,
+    private var posts: ArrayList<Post>?,
     private val onPostClicked: ((Post?) -> Unit)?,
     private val onEditClicked: ((Post?) -> Unit)?,
     private val onDeleteClicked: ((Int) -> Unit)?,
-) : ListAdapter<Post, PostAdapter.PostVH>(DIFF) {
+) : RecyclerView.Adapter<PostAdapter.PostVH>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostVH {
         return PostVH(ItemPostBinding.inflate(LayoutInflater.from(context), parent, false))
     }
 
     override fun onBindViewHolder(holder: PostVH, position: Int) {
-        val pos = holder.bindingAdapterPosition
+        val pos = holder.absoluteAdapterPosition
         holder.bind(pos)
     }
 
-    fun removePost(position: Int, callback: ((Boolean) -> Unit)?) {
-        try {
-            val currentList = currentList.toMutableList()
-            currentList.removeAt(position)
-            submitList(currentList)
+    override fun getItemCount() = posts?.size ?: 0
+
+    fun getItem(position: Int) = posts?.get(position)
+
+    fun updateList(list: ArrayList<Post>?) {
+        posts = list
+        notifyDataSetChanged()
+    }
+
+    fun removeItem(position: Int, callback: ((Boolean) -> Unit)?) {
+        if (position > RecyclerView.NO_POSITION) {
+            posts?.removeAt(position)
+            notifyItemRemoved(position)
+            notifyItemRangeChanged(position, itemCount)
             callback?.invoke(true)
-        } catch (e: Exception) {
+        } else {
             callback?.invoke(false)
         }
     }
@@ -53,9 +61,4 @@ class PostAdapter(
             binding.tvBody.text = post?.body
         }
     }
-}
-
-private object DIFF : DiffUtil.ItemCallback<Post>() {
-    override fun areItemsTheSame(old: Post, new: Post) = old.id == new.id
-    override fun areContentsTheSame(old: Post, new: Post) = old == new
 }

@@ -7,8 +7,8 @@
     <string name="error_internal_server">Internal server error.</string>
     <string name="error_timeout">The connection to server timed out.</string>
     <string name="error_internet">Please check your internet connection and try again.</string>
-    <string name="add_post">Add post…</string>
-    <string name="edit_post">Edit post…</string>
-    <string name="delete_post">Delete post…</string>
+    <string name="add_post">Add post</string>
+    <string name="edit_post">Edit post</string>
+    <string name="delete_post">Delete post</string>
     <string name="not_implemented_yet">Not implemented yet.</string>
 </resources>

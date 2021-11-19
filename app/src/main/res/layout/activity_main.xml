@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:indeterminate="true"
-                android:indeterminateTint="@color/purple_700"
+                android:indeterminateTint="?attr/colorPrimary"
                 android:indeterminateTintMode="src_atop" />
         </FrameLayout>
     </RelativeLayout>

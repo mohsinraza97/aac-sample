@@ -59,7 +59,7 @@ fun EditText.onTextChanged(onTextChanged: (String?) -> Unit) {
 }
 
 @ColorInt
-fun Context.themeColor(@AttrRes attrRes: Int): Int {
+fun Context.getThemeColor(@AttrRes attrRes: Int): Int {
     return TypedValue()
         .apply { theme.resolveAttribute(attrRes, this, true) }
         .data

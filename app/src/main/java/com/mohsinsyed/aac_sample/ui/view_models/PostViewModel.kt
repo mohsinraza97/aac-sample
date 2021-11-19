@@ -1,6 +1,5 @@
 package com.mohsinsyed.aac_sample.ui.view_models
 
-import android.provider.CalendarContract
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -29,6 +28,7 @@ class PostViewModel @Inject constructor(
             toggleLoading(true)
             when (val response = repository.create(post)) {
                 is Response.Success -> _events.value = PostEvents.Added(response.value)
+                is Response.Error -> setUIEvent(UIEvents.Message(response.message))
                 is Response.Failed -> setUIEvent(UIEvents.Message(response.message))
             }
             toggleLoading(false)
@@ -39,8 +39,9 @@ class PostViewModel @Inject constructor(
         setUIEvent(UIEvents.HideKeyboard)
         viewModelScope.launch {
             toggleLoading(true)
-            when (val response = repository.update(post, post?.id)) {
-                is Response.Success -> _events.value = PostEvents.Edited(response.value)
+            when (val response = repository.update(post)) {
+                is Response.Success -> _events.value = PostEvents.Updated(response.value)
+                is Response.Error -> setUIEvent(UIEvents.Message(response.message))
                 is Response.Failed -> setUIEvent(UIEvents.Message(response.message))
             }
             toggleLoading(false)
@@ -52,6 +53,7 @@ class PostViewModel @Inject constructor(
             toggleLoading(true)
             when (val response = repository.delete(id)) {
                 is Response.Success -> _events.value = PostEvents.Deleted
+                is Response.Error -> setUIEvent(UIEvents.Message(response.message))
                 is Response.Failed -> setUIEvent(UIEvents.Message(response.message))
             }
             toggleLoading(false)
@@ -65,7 +67,7 @@ class PostViewModel @Inject constructor(
             }
             when (val response = repository.fetchAll()) {
                 is Response.Success -> _posts.value = response.value
-                is Response.Failed -> setUIEvent(UIEvents.Message(response.message))
+                is Response.Error -> setUIEvent(UIEvents.Message(response.message))
             }
             toggleLoading(false)
         }
@@ -73,7 +75,7 @@ class PostViewModel @Inject constructor(
 
     sealed class PostEvents {
         data class Added(val post: Post?) : PostEvents()
-        data class Edited(val post: Post?) : PostEvents()
+        data class Updated(val post: Post?) : PostEvents()
         object Deleted : PostEvents()
     }
 }

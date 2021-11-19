@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mohsinsyed.aac_sample.data.entities.Post
 import com.mohsinsyed.aac_sample.databinding.ItemPostBinding
 
+// Use ListAdapter with DIFF util for excellent performance!
+// Had to use RecyclerView due to some issue with removing item from list
 class PostAdapter(
     private val context: Context,
     private var posts: ArrayList<Post>?,

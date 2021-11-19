@@ -1,5 +1,7 @@
 package com.mohsinsyed.aac_sample.utils.constants
 
+import com.mohsinsyed.aac_sample.BuildConfig
+
 object AppConstants {
 
     object NetworkConstants {
@@ -14,4 +16,13 @@ object AppConstants {
     object DBConstants {
         const val DB_NAME = "AAC_Database"
     }
+
+    object SyncConstants {
+        private const val BASE_TAG = BuildConfig.APPLICATION_ID
+        const val TAG_CREATE_POST = "$BASE_TAG.create_post"
+        const val TAG_UPDATE_POST = "$BASE_TAG.edit_post"
+        const val TAG_DELETE_POST = "$BASE_TAG.delete_post"
+    }
+
+    const val EXTRA_KEY_POST = "post"
 }

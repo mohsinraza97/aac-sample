@@ -9,31 +9,30 @@ import org.json.JSONObject
 import retrofit2.HttpException
 import java.net.SocketException
 import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 import javax.inject.Inject
 
 open class BaseRepository @Inject constructor(
     @ApplicationContext open val context: Context?
 ) {
-    protected inline fun <T> networkRequest(call: () -> T): Response<T> {
+    protected inline fun <T> sendCoroutineRequest(call: () -> T): Response<T> {
         return try {
             Response.Success(call())
         } catch (e: HttpException) {
             val firstMessage = when (e.code()) {
                 in 500..511 -> context?.getString(R.string.error_internal_server)
-                else -> getFirstErrorMessage(e)
+                else -> getHttpErrorMessage(e)
             }
-            Response.Failed(firstMessage ?: e.message() ?: e.toString(), e.code())
+            Response.Error(firstMessage ?: e.message() ?: e.toString(), e.code())
         } catch (e: SocketTimeoutException) {
-            Response.Failed(context?.getString(R.string.error_timeout) ?: e.message ?: e.toString())
+            Response.Error(context?.getString(R.string.error_timeout) ?: e.message ?: e.toString())
         } catch (e: SocketException) {
-            Response.Failed(context?.getString(R.string.error_internet) ?: e.message ?: e.toString())
+            Response.Error(context?.getString(R.string.error_internet) ?: e.message ?: e.toString())
         } catch (e: Exception) {
-            Response.Failed(e.message ?: e.toString())
+            Response.Error(e.message ?: e.toString())
         }
     }
 
-    protected fun getFirstErrorMessage(e: HttpException): String? {
+    protected fun getHttpErrorMessage(e: HttpException): String? {
         return try {
             val errorJson = e.response()?.errorBody()?.string()?.let(::JSONObject)
             val errors = errorJson?.getJSONObject("errors")

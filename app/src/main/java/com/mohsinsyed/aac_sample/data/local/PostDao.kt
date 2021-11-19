@@ -7,20 +7,26 @@ import com.mohsinsyed.aac_sample.data.entities.Post
 @Dao
 interface PostDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(post: Post?) : Long?
+    suspend fun insert(post: Post?): Long?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(vararg posts: Post?) : List<Long>?
+    suspend fun insertAll(posts: List<Post>?): List<Long>?
 
     @Update
-    suspend fun update(post: Post?) : Int?
+    suspend fun update(post: Post?): Int?
+
+    @Update
+    suspend fun updateAll(posts: List<Post>?): Int?
 
     @Query("DELETE FROM post where id = :id")
-    suspend fun delete(id: Int?) : Int?
+    suspend fun delete(id: Int?): Int?
 
-    @Query("SELECT * FROM post")
-    suspend fun fetchAll() : List<Post>?
+    @Query("DELETE FROM post")
+    suspend fun deleteAll(): Int?
 
     @Query("SELECT * FROM post where id = :id")
-    suspend fun fetch(id: Int?) : Post?
+    suspend fun findById(id: Int?): Post?
+
+    @Query("SELECT * FROM post")
+    suspend fun findAll(): List<Post>?
 }

@@ -15,7 +15,9 @@ import com.mohsinsyed.aac_sample.data.entities.Post
 import com.mohsinsyed.aac_sample.databinding.FragmentPostListBinding
 import com.mohsinsyed.aac_sample.ui.adapters.PostAdapter
 import com.mohsinsyed.aac_sample.ui.view_models.PostViewModel
+import com.mohsinsyed.aac_sample.utils.constants.AppConstants
 import com.mohsinsyed.aac_sample.utils.extensions.*
+import com.mohsinsyed.aac_sample.utils.utilities.AppUtility
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -61,7 +63,7 @@ class PostListFragment : Fragment() {
             navigateTo(R.id.action_destination_post_list_to_post_editor)
         }
         binding?.swipeRefresh?.apply {
-            setColorSchemeColors(requireContext().themeColor(R.attr.colorPrimary))
+            setColorSchemeColors(requireContext().getThemeColor(R.attr.colorPrimary))
             setOnRefreshListener { loadData(showLoading = false) }
         }
     }
@@ -91,13 +93,13 @@ class PostListFragment : Fragment() {
     }
 
     private fun onPostClicked(post: Post?) {
-        bundleOf("post" to post).let {
+        bundleOf(AppConstants.EXTRA_KEY_POST to post).let {
             navigateTo(R.id.action_post_list_to_post_detail, it)
         }
     }
 
     private fun onEditClicked(post: Post?) {
-        bundleOf("post" to post).let {
+        bundleOf(AppConstants.EXTRA_KEY_POST to post).let {
             navigateTo(R.id.action_destination_post_list_to_post_editor, it)
         }
     }

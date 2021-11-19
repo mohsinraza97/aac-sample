@@ -10,6 +10,7 @@ import androidx.navigation.fragment.navArgs
 import com.mohsinsyed.aac_sample.R
 import com.mohsinsyed.aac_sample.data.entities.Post
 import com.mohsinsyed.aac_sample.databinding.FragmentPostDetailBinding
+import com.mohsinsyed.aac_sample.utils.constants.AppConstants
 import com.mohsinsyed.aac_sample.utils.extensions.setToolBarTitle
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -32,7 +33,7 @@ class PostDetailFragment : Fragment() {
 
     private fun init() {
         setToolBarTitle(getString(R.string.fragment_title_post_detail), true)
-        val post = arguments?.getSerializable("post") as? Post?
+        val post = arguments?.getSerializable(AppConstants.EXTRA_KEY_POST) as? Post?
         binding?.tvTitle?.text = post?.title
         binding?.tvBody?.text = post?.body
     }

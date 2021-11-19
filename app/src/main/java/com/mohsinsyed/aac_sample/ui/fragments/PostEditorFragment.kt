@@ -14,6 +14,7 @@ import com.mohsinsyed.aac_sample.data.entities.Post
 import com.mohsinsyed.aac_sample.data.enums.EditorMode
 import com.mohsinsyed.aac_sample.databinding.FragmentPostEditorBinding
 import com.mohsinsyed.aac_sample.ui.view_models.PostViewModel
+import com.mohsinsyed.aac_sample.utils.constants.AppConstants
 import com.mohsinsyed.aac_sample.utils.extensions.onTextChanged
 import com.mohsinsyed.aac_sample.utils.extensions.setToolBarTitle
 import com.mohsinsyed.aac_sample.utils.extensions.showSnackBar
@@ -43,7 +44,7 @@ class PostEditorFragment : Fragment() {
     }
 
     private fun init() {
-        post = arguments?.getSerializable("post") as? Post?
+        post = arguments?.getSerializable(AppConstants.EXTRA_KEY_POST) as? Post?
         val toolbarTitle = if (post == null) {
             mode = EditorMode.ADD
             getString(R.string.add_post)
@@ -107,7 +108,7 @@ class PostEditorFragment : Fragment() {
                     binding?.root?.showSnackBar(getString(R.string.post_action_message, "added"))
                     findNavController().popBackStack()
                 }
-                is PostViewModel.PostEvents.Edited -> {
+                is PostViewModel.PostEvents.Updated -> {
                     binding?.root?.showSnackBar(getString(R.string.post_action_message, "updated"))
                     findNavController().popBackStack()
                 }

@@ -4,6 +4,7 @@ import timber.log.Timber
 
 object AppUtility {
 
+    @JvmStatic
     fun debugLog(message: String) {
         Timber.d(message)
     }

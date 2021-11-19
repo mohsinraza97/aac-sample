@@ -6,11 +6,12 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import com.mohsinsyed.aac_sample.R
 import com.mohsinsyed.aac_sample.databinding.ActivityMainBinding
+import com.mohsinsyed.aac_sample.ui.view_models.BaseViewModel
 import com.mohsinsyed.aac_sample.ui.view_models.PostViewModel
+import com.mohsinsyed.aac_sample.utils.extensions.hideKeyboard
 import com.mohsinsyed.aac_sample.utils.extensions.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -47,9 +48,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
-        postViewModel.uiError.observe(this, {
-            if (it != null) {
-                binding?.root?.showSnackBar(it)
+        postViewModel.uiEvents.observe(this, { event ->
+            when (event) {
+                is BaseViewModel.UIEvents.Message -> binding?.root?.showSnackBar(event.message)
+                is BaseViewModel.UIEvents.HideKeyboard -> hideKeyboard()
             }
         })
     }

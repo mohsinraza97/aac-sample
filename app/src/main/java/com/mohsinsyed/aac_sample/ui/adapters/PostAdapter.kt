@@ -13,24 +13,37 @@ class PostAdapter(
     private val context: Context,
     private val onPostClicked: ((Post?) -> Unit)?,
     private val onEditClicked: ((Post?) -> Unit)?,
-    private val onDeleteClicked: ((Post?) -> Unit)?
+    private val onDeleteClicked: ((Int) -> Unit)?,
 ) : ListAdapter<Post, PostAdapter.PostVH>(DIFF) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostVH {
         return PostVH(ItemPostBinding.inflate(LayoutInflater.from(context), parent, false))
     }
 
     override fun onBindViewHolder(holder: PostVH, position: Int) {
-        holder.bind(getItem(position))
+        val pos = holder.bindingAdapterPosition
+        holder.bind(pos)
+    }
+
+    fun removePost(position: Int, callback: ((Boolean) -> Unit)?) {
+        try {
+            val currentList = currentList.toMutableList()
+            currentList.removeAt(position)
+            submitList(currentList)
+            callback?.invoke(true)
+        } catch (e: Exception) {
+            callback?.invoke(false)
+        }
     }
 
     inner class PostVH(private val binding: ItemPostBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(post: Post?) {
+        fun bind(position: Int) {
+            val post = getItem(position)
             binding.root.setOnClickListener {
                 onPostClicked?.invoke(post)
             }
             binding.btnDelete.setOnClickListener {
-                onDeleteClicked?.invoke(post)
+                onDeleteClicked?.invoke(position)
             }
             binding.btnEdit.setOnClickListener {
                 onEditClicked?.invoke(post)

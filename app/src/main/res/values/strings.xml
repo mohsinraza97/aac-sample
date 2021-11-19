@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">AAC Sample</string>
 
     <string name="fragment_title_post_list">My Posts</string>
@@ -11,4 +11,10 @@
     <string name="edit_post">Edit post</string>
     <string name="delete_post">Delete post</string>
     <string name="not_implemented_yet">Not implemented yet.</string>
+    <string name="hint_title">Title</string>
+    <string name="hint_body">Body</string>
+    <string name="submit">Submit</string>
+    <string name="cancel">Cancel</string>
+    <string name="error_required">This field is required.</string>
+    <string name="post_action_message">Post <xliff:g id="action">%s</xliff:g> successfully.</string>
 </resources>

@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_post_list_to_post_detail"
             app:destination="@id/destination_post_detail" />
+        <action
+            android:id="@+id/action_destination_post_list_to_post_editor"
+            app:destination="@id/destination_post_editor" />
     </fragment>
 
     <fragment
@@ -20,4 +23,9 @@
         android:name="com.mohsinsyed.aac_sample.ui.fragments.PostDetailFragment"
         android:label="@string/fragment_title_post_detail"
         tools:layout="@layout/fragment_post_detail" />
+    <fragment
+        android:id="@+id/destination_post_editor"
+        android:name="com.mohsinsyed.aac_sample.ui.fragments.PostEditorFragment"
+        android:label="@string/add_post"
+        tools:layout="@layout/fragment_post_editor" />
 </navigation>

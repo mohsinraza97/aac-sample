@@ -6,20 +6,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.mohsinsyed.aac_sample.R
 import com.mohsinsyed.aac_sample.data.entities.Post
 import com.mohsinsyed.aac_sample.databinding.FragmentPostListBinding
 import com.mohsinsyed.aac_sample.ui.adapters.PostAdapter
 import com.mohsinsyed.aac_sample.ui.view_models.PostViewModel
-import com.mohsinsyed.aac_sample.utils.extensions.addDivider
-import com.mohsinsyed.aac_sample.utils.extensions.navigateTo
-import com.mohsinsyed.aac_sample.utils.extensions.setToolBarTitle
-import com.mohsinsyed.aac_sample.utils.extensions.showSnackBar
+import com.mohsinsyed.aac_sample.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -35,10 +35,11 @@ class PostListFragment : Fragment() {
             onDeleteClicked = ::onDeleteClicked
         )
     }
+    private var deletedPostPosition = RecyclerView.NO_POSITION
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_post_list, container, false)
         return binding?.root
@@ -53,22 +54,43 @@ class PostListFragment : Fragment() {
 
     private fun init() {
         setToolBarTitle(getString(R.string.fragment_title_post_list))
+        binding?.viewModel = postViewModel
         binding?.rvPosts?.apply {
             adapter = postAdapter
             layoutManager = LinearLayoutManager(context)
             addDivider()
         }
         binding?.fabAdd?.setOnClickListener {
-            binding?.root?.showSnackBar(getString(R.string.not_implemented_yet))
+            navigateTo(R.id.action_destination_post_list_to_post_editor)
+        }
+        binding?.swipeRefresh?.apply {
+            setColorSchemeColors(requireContext().themeColor(R.attr.colorPrimary))
+            setOnRefreshListener { loadData(showLoading = false) }
         }
     }
 
     private fun setUpObservers() {
-        postViewModel.posts.observe(viewLifecycleOwner, { postAdapter.submitList(it) })
+        postViewModel.posts.observe(viewLifecycleOwner, {
+            if (binding?.swipeRefresh?.isRefreshing == true) {
+                binding?.swipeRefresh?.isRefreshing = false
+            }
+            postAdapter.submitList(it)
+        })
+        postViewModel.events.observe(viewLifecycleOwner, { event ->
+            when (event) {
+                is PostViewModel.PostEvents.Deleted -> {
+                    postAdapter.removePost(deletedPostPosition) {
+                        if (it) {
+                            binding?.root?.showSnackBar(getString(R.string.post_action_message, "deleted"))
+                        }
+                    }
+                }
+            }
+        })
     }
 
-    private fun loadData() {
-        postViewModel.fetchAll()
+    private fun loadData(showLoading: Boolean = true) {
+        postViewModel.fetchAll(showLoading)
     }
 
     private fun onPostClicked(post: Post?) {
@@ -78,10 +100,14 @@ class PostListFragment : Fragment() {
     }
 
     private fun onEditClicked(post: Post?) {
-        binding?.root?.showSnackBar(getString(R.string.not_implemented_yet))
+        bundleOf("post" to post).let {
+            navigateTo(R.id.action_destination_post_list_to_post_editor, it)
+        }
     }
 
-    private fun onDeleteClicked(post: Post?) {
-        binding?.root?.showSnackBar(getString(R.string.not_implemented_yet))
+    private fun onDeleteClicked(position: Int) {
+        deletedPostPosition = position
+        val id = postViewModel.posts.value?.get(position)?.id
+        postViewModel.delete(id)
     }
 }

@@ -8,6 +8,7 @@ buildscript {
         core_ktx_version = "1.7.0"
         material_version = "1.4.0"
         nav_version = "2.3.5"
+        recyclerview_version = "1.2.1"
         lifecycle_version = "2.4.0"
         lifecycle_ext_version = "2.2.0"
         hilt_version = "2.38.1"

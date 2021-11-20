@@ -1,4 +1,4 @@
-package com.mohsinsyed.aac_sample.data.entities
+package com.mohsinsyed.aac_sample.data.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -10,7 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputLayout
 import com.mohsinsyed.aac_sample.R
-import com.mohsinsyed.aac_sample.data.entities.Post
+import com.mohsinsyed.aac_sample.data.models.Post
 import com.mohsinsyed.aac_sample.data.enums.EditorMode
 import com.mohsinsyed.aac_sample.databinding.FragmentPostEditorBinding
 import com.mohsinsyed.aac_sample.ui.view_models.PostViewModel

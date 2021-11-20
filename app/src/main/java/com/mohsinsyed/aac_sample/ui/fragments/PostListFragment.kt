@@ -11,13 +11,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mohsinsyed.aac_sample.R
-import com.mohsinsyed.aac_sample.data.entities.Post
+import com.mohsinsyed.aac_sample.data.models.Post
 import com.mohsinsyed.aac_sample.databinding.FragmentPostListBinding
 import com.mohsinsyed.aac_sample.ui.adapters.PostAdapter
 import com.mohsinsyed.aac_sample.ui.view_models.PostViewModel
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants
 import com.mohsinsyed.aac_sample.utils.extensions.*
-import com.mohsinsyed.aac_sample.utils.utilities.AppUtility
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

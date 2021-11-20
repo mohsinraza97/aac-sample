@@ -2,7 +2,7 @@ package com.mohsinsyed.aac_sample.data.repository
 
 import android.content.Context
 import com.mohsinsyed.aac_sample.R
-import com.mohsinsyed.aac_sample.data.remote.Response
+import com.mohsinsyed.aac_sample.data.models.Response
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.json.JSONException
 import org.json.JSONObject

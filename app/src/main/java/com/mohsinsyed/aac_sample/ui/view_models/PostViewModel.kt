@@ -3,8 +3,8 @@ package com.mohsinsyed.aac_sample.ui.view_models
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.mohsinsyed.aac_sample.data.entities.Post
-import com.mohsinsyed.aac_sample.data.remote.Response
+import com.mohsinsyed.aac_sample.data.models.Post
+import com.mohsinsyed.aac_sample.data.models.Response
 import com.mohsinsyed.aac_sample.data.repository.PostRepository
 import com.mohsinsyed.aac_sample.utils.utilities.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel

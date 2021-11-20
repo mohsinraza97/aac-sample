@@ -6,9 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.navigation.fragment.navArgs
 import com.mohsinsyed.aac_sample.R
-import com.mohsinsyed.aac_sample.data.entities.Post
+import com.mohsinsyed.aac_sample.data.models.Post
 import com.mohsinsyed.aac_sample.databinding.FragmentPostDetailBinding
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants
 import com.mohsinsyed.aac_sample.utils.extensions.setToolBarTitle

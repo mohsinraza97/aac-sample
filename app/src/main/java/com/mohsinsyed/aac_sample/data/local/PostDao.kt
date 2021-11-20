@@ -1,7 +1,7 @@
 package com.mohsinsyed.aac_sample.data.local
 
 import androidx.room.*
-import com.mohsinsyed.aac_sample.data.entities.Post
+import com.mohsinsyed.aac_sample.data.models.Post
 
 // https://developer.android.com/training/data-storage/room/accessing-data#convenience-insert
 @Dao

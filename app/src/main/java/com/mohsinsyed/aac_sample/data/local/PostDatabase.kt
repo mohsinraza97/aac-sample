@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.mohsinsyed.aac_sample.data.entities.Post
+import com.mohsinsyed.aac_sample.data.models.Post
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants
 
 @Database(entities = [Post::class], version = 1, exportSchema = false)

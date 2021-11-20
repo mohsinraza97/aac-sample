@@ -2,8 +2,8 @@ package com.mohsinsyed.aac_sample.data.repository
 
 import android.content.Context
 import com.mohsinsyed.aac_sample.R
-import com.mohsinsyed.aac_sample.data.entities.Post
-import com.mohsinsyed.aac_sample.data.remote.Response
+import com.mohsinsyed.aac_sample.data.models.Post
+import com.mohsinsyed.aac_sample.data.models.Response
 import com.mohsinsyed.aac_sample.data.local.PostDao
 import com.mohsinsyed.aac_sample.data.remote.PostService
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants

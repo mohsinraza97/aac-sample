@@ -1,4 +1,4 @@
-package com.mohsinsyed.aac_sample.data.remote
+package com.mohsinsyed.aac_sample.data.models
 
 sealed class Response<T> {
     data class Success<T>(val value: T) : Response<T>()

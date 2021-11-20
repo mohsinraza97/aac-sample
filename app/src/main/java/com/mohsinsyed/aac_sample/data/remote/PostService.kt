@@ -1,6 +1,6 @@
 package com.mohsinsyed.aac_sample.data.remote
 
-import com.mohsinsyed.aac_sample.data.entities.Post
+import com.mohsinsyed.aac_sample.data.models.Post
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants
 import retrofit2.http.*
 

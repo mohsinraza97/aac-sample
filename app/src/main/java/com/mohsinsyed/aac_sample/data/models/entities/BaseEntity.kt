@@ -13,6 +13,9 @@ abstract class BaseEntity : Serializable {
     @PrimaryKey(autoGenerate = true)
     var id: Long? = null
 
+    @ColumnInfo(name = "unique_id")
+    var uniqueId: String = UUID.randomUUID().toString()
+
     @ColumnInfo(name = "created_at")
     @TypeConverters(TimestampConverter::class)
     var createdAt: Date? = Date()

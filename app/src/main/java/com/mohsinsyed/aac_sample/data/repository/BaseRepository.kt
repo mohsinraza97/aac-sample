@@ -22,7 +22,7 @@ open class BaseRepository @Inject constructor(
     @ApplicationContext open val context: Context?,
     open val outboxDao: OutboxDao,
 ) {
-    protected inline fun <T> sendCoroutineRequest(call: () -> T): Response<T> {
+    inline fun <T> sendCoroutineRequest(call: () -> T): Response<T> {
         return try {
             Response.Success(call())
         } catch (e: HttpException) {
@@ -40,7 +40,7 @@ open class BaseRepository @Inject constructor(
         }
     }
 
-    protected fun getHttpErrorMessage(e: HttpException): String? {
+    fun getHttpErrorMessage(e: HttpException): String? {
         return try {
             val errorJson = e.response()?.errorBody()?.string()?.let(::JSONObject)
             val errors = errorJson?.getJSONObject("errors")
@@ -52,7 +52,7 @@ open class BaseRepository @Inject constructor(
     }
 
     // region local-data source
-    protected suspend fun <T> addToOutboxWithSyncRequest(
+    suspend fun <T> addToOutboxWithSyncRequest(
         apiResponse: Response<T>,
         value: Any?,
         tag: String,
@@ -62,10 +62,7 @@ open class BaseRepository @Inject constructor(
             val outboxResponse = sendCoroutineRequest { outboxDao.insert(outboxItem) }
             if (outboxResponse is Response.Success) {
                 LogUtils.debugLog("Added to outbox: $outboxItem")
-                context?.let {
-                    LogUtils.debugLog("Initiating sync request with tag: $tag")
-                    SyncUtils.createRequest(it, tag)
-                }
+                context?.let { SyncUtils.createRequest(it, tag) }
             }
         }
     }

@@ -23,13 +23,14 @@ object SyncUtils {
             WorkManager.getInstance(context).enqueueUniqueWork(tag,
                 ExistingWorkPolicy.KEEP,
                 request)
+            LogUtils.debugLog("Initiating sync request with tag: $tag")
         }
     }
 
     private fun isRequestRunning(context: Context, tag: String): Boolean {
-        val instance = WorkManager.getInstance(context)
-        val workInfoList = instance.getWorkInfosByTag(tag).get()
         return try {
+            val instance = WorkManager.getInstance(context)
+            val workInfoList = instance.getWorkInfosByTag(tag).get()
             var running = false
             for (workInfo in workInfoList) {
                 val state = workInfo.state

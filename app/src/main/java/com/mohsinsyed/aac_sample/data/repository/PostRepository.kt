@@ -21,12 +21,11 @@ class PostRepository @Inject constructor(
     val postDao: PostDao,
     override val outboxDao: OutboxDao,
 ) : BaseRepository(context, outboxDao) {
+
     suspend fun create(post: Post?): Response<Post?> {
         val dbResponse = sendCoroutineRequest { postDao.insert(post) }
         if (dbResponse is Response.Success) {
-            sendCoroutineRequest { postService.create(post) }.also {
-                addToOutboxWithSyncRequest(it, post, SYNC_TAG_CREATE_POST)
-            }
+            addToOutboxWithSyncRequest(post, SYNC_TAG_CREATE_POST)
             return sendCoroutineRequest { postDao.findById(dbResponse.value) }
         }
         return Response.Failed(context?.getString(R.string.general_ui_error))
@@ -35,9 +34,7 @@ class PostRepository @Inject constructor(
     suspend fun update(post: Post?): Response<Post?> {
         val dbResponse = sendCoroutineRequest { postDao.update(post) }
         if (dbResponse is Response.Success) {
-            sendCoroutineRequest { postService.update(post, post?.id) }.also {
-                addToOutboxWithSyncRequest(it, post, SYNC_TAG_UPDATE_POST)
-            }
+            addToOutboxWithSyncRequest(post, SYNC_TAG_UPDATE_POST)
             return sendCoroutineRequest { postDao.findById(post?.id) }
         }
         return Response.Failed(context?.getString(R.string.general_ui_error))
@@ -46,9 +43,7 @@ class PostRepository @Inject constructor(
     suspend fun delete(id: Long?): Response<Unit?> {
         val dbResponse = sendCoroutineRequest { postDao.delete(id) }
         if (dbResponse is Response.Success) {
-            sendCoroutineRequest { postService.delete(id) }.also {
-                addToOutboxWithSyncRequest(it, id, SYNC_TAG_DELETE_POST)
-            }
+            addToOutboxWithSyncRequest(id, SYNC_TAG_DELETE_POST)
             return Response.Success(Unit)
         }
         return Response.Failed(context?.getString(R.string.general_ui_error))

@@ -52,18 +52,12 @@ open class BaseRepository @Inject constructor(
     }
 
     // region local-data source
-    suspend fun <T> addToOutboxWithSyncRequest(
-        apiResponse: Response<T>,
-        value: Any?,
-        tag: String,
-    ) {
-        if (apiResponse is Response.Error) {
-            val outboxItem = getOutboxItem(value, tag)
-            val outboxResponse = sendCoroutineRequest { outboxDao.insert(outboxItem) }
-            if (outboxResponse is Response.Success) {
-                LogUtils.debugLog("Added to outbox: $outboxItem")
-                context?.let { SyncUtils.createRequest(it, tag) }
-            }
+    suspend fun addToOutboxWithSyncRequest(value: Any?, tag: String, ) {
+        val outboxItem = getOutboxItem(value, tag)
+        val outboxResponse = sendCoroutineRequest { outboxDao.insert(outboxItem) }
+        if (outboxResponse is Response.Success) {
+            LogUtils.debugLog("Added to outbox: $outboxItem")
+            context?.let { SyncUtils.createRequest(it, tag) }
         }
     }
 

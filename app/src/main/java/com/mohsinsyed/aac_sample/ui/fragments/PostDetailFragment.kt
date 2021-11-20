@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import com.mohsinsyed.aac_sample.R
-import com.mohsinsyed.aac_sample.data.models.Post
+import com.mohsinsyed.aac_sample.data.models.entities.Post
 import com.mohsinsyed.aac_sample.databinding.FragmentPostDetailBinding
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants
 import com.mohsinsyed.aac_sample.utils.extensions.setToolBarTitle
@@ -32,8 +32,8 @@ class PostDetailFragment : Fragment() {
 
     private fun init() {
         setToolBarTitle(getString(R.string.fragment_title_post_detail), true)
-        val post = arguments?.getSerializable(AppConstants.EXTRA_KEY_POST) as? Post?
+        val post = arguments?.getSerializable(AppConstants.IntentConstants.EXTRA_KEY_POST) as? Post?
         binding?.tvTitle?.text = post?.title
-        binding?.tvBody?.text = post?.body
+        binding?.tvDescription?.text = post?.description
     }
 }

@@ -6,7 +6,7 @@ object AppConstants {
 
     object NetworkConstants {
         const val BASE_URL = "https://jsonplaceholder.typicode.com/"
-        const val USER_ID = 1 // Hard-coded user id
+        const val USER_ID = 1L // Hard-coded user id
 
         const val CREATE_POST = "posts" // POST
         const val MODIFY_POST = "posts/{postId}" // PUT, DELETE
@@ -15,14 +15,23 @@ object AppConstants {
 
     object DBConstants {
         const val DB_NAME = "AAC_Database"
+
+        const val OUTBOX_STATUS_PENDING = "PENDING"
+        const val OUTBOX_STATUS_IN_PROGRESS = "IN_PROGRESS"
+        const val OUTBOX_STATUS_FAILED = "FAILED"
+        const val OUTBOX_STATUS_COMPLETED = "COMPLETED"
+        const val OUTBOX_STATUS_DELETED = "DELETED"
     }
 
     object SyncConstants {
-        private const val BASE_TAG = BuildConfig.APPLICATION_ID
-        const val TAG_CREATE_POST = "$BASE_TAG.create_post"
-        const val TAG_UPDATE_POST = "$BASE_TAG.edit_post"
-        const val TAG_DELETE_POST = "$BASE_TAG.delete_post"
+        private const val SYNC_BASE_TAG = BuildConfig.APPLICATION_ID
+
+        const val SYNC_TAG_CREATE_POST = "$SYNC_BASE_TAG.create_post"
+        const val SYNC_TAG_UPDATE_POST = "$SYNC_BASE_TAG.edit_post"
+        const val SYNC_TAG_DELETE_POST = "$SYNC_BASE_TAG.delete_post"
     }
 
-    const val EXTRA_KEY_POST = "post"
+    object IntentConstants {
+        const val EXTRA_KEY_POST = "post"
+    }
 }

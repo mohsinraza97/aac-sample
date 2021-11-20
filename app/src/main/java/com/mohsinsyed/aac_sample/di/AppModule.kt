@@ -3,8 +3,9 @@ package com.mohsinsyed.aac_sample.di
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.mohsinsyed.aac_sample.data.local.PostDao
+import com.mohsinsyed.aac_sample.data.local.dao.PostDao
 import com.mohsinsyed.aac_sample.data.local.PostDatabase
+import com.mohsinsyed.aac_sample.data.local.dao.OutboxDao
 import com.mohsinsyed.aac_sample.data.remote.PostService
 import com.mohsinsyed.aac_sample.data.repository.PostRepository
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants
@@ -76,6 +77,12 @@ object AppModule {
     fun providePostDao(postDatabase: PostDatabase): PostDao {
         return postDatabase.postDao()
     }
+
+    @Provides
+    @Singleton
+    fun provideOutboxDao(postDatabase: PostDatabase): OutboxDao {
+        return postDatabase.outboxDao()
+    }
     // endregion
 
     // region repository
@@ -84,9 +91,10 @@ object AppModule {
     fun providePostRepository(
         @ApplicationContext context: Context,
         postService: PostService,
-        postDao: PostDao
+        postDao: PostDao,
+        outboxDao: OutboxDao
     ): PostRepository {
-        return PostRepository(context, postService, postDao)
+        return PostRepository(context, postService, postDao, outboxDao)
     }
     // endregion
 }

@@ -1,18 +1,20 @@
 package com.mohsinsyed.aac_sample
 
 import android.app.Application
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
-import timber.log.Timber
-
-import timber.log.Timber.DebugTree
+import javax.inject.Inject
 
 @HiltAndroidApp
-class PostApp : Application() {
-    override fun onCreate() {
-        super.onCreate()
+class PostApp : Application(), Configuration.Provider {
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
-        if (BuildConfig.DEBUG) {
-            Timber.plant(DebugTree())
-        }
+    override fun getWorkManagerConfiguration(): Configuration {
+        return Configuration.Builder()
+            .setMinimumLoggingLevel(android.util.Log.INFO)
+            .setWorkerFactory(workerFactory)
+            .build()
     }
 }

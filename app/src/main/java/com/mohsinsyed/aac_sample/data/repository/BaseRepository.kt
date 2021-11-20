@@ -2,7 +2,14 @@ package com.mohsinsyed.aac_sample.data.repository
 
 import android.content.Context
 import com.mohsinsyed.aac_sample.R
+import com.mohsinsyed.aac_sample.data.local.dao.OutboxDao
 import com.mohsinsyed.aac_sample.data.models.Response
+import com.mohsinsyed.aac_sample.data.models.entities.Outbox
+import com.mohsinsyed.aac_sample.utils.constants.AppConstants.DBConstants.OUTBOX_STATUS_FAILED
+import com.mohsinsyed.aac_sample.utils.constants.AppConstants.DBConstants.OUTBOX_STATUS_PENDING
+import com.mohsinsyed.aac_sample.utils.utilities.GsonUtils
+import com.mohsinsyed.aac_sample.utils.utilities.LogUtils
+import com.mohsinsyed.aac_sample.utils.utilities.SyncUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.json.JSONException
 import org.json.JSONObject
@@ -12,7 +19,8 @@ import java.net.SocketTimeoutException
 import javax.inject.Inject
 
 open class BaseRepository @Inject constructor(
-    @ApplicationContext open val context: Context?
+    @ApplicationContext open val context: Context?,
+    open val outboxDao: OutboxDao,
 ) {
     protected inline fun <T> sendCoroutineRequest(call: () -> T): Response<T> {
         return try {
@@ -42,4 +50,37 @@ open class BaseRepository @Inject constructor(
             null
         }
     }
+
+    // region local-data source
+    protected suspend fun <T> addToOutboxWithSyncRequest(
+        apiResponse: Response<T>,
+        value: Any?,
+        tag: String,
+    ) {
+        if (apiResponse is Response.Error) {
+            val outboxItem = getOutboxItem(value, tag)
+            val outboxResponse = sendCoroutineRequest { outboxDao.insert(outboxItem) }
+            if (outboxResponse is Response.Success) {
+                LogUtils.debugLog("Added to outbox: $outboxItem")
+                context?.let {
+                    LogUtils.debugLog("Initiating sync request with tag: $tag")
+                    SyncUtils.createRequest(it, tag)
+                }
+            }
+        }
+    }
+
+    private fun getOutboxItem(value: Any?, tag: String): Outbox {
+        val data = GsonUtils.toJson(value)
+        return Outbox(data, tag, OUTBOX_STATUS_PENDING)
+    }
+
+    suspend fun fetchOutboxPendingRequests(): List<Outbox>? {
+        val dbResponse = sendCoroutineRequest { outboxDao.findByStatus(OUTBOX_STATUS_PENDING, OUTBOX_STATUS_FAILED) }
+        if (dbResponse is Response.Success) {
+            return dbResponse.value
+        }
+        return null
+    }
+    // endregion
 }

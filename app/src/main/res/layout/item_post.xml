@@ -24,7 +24,7 @@
             tools:text="@string/app_name" />
 
         <TextView
-            android:id="@+id/tv_body"
+            android:id="@+id/tv_description"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
@@ -48,7 +48,7 @@
             android:contentDescription="@string/edit_post"
             android:padding="8dp"
             android:src="@drawable/ic_edit"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_body"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_description"
             app:layout_constraintEnd_toStartOf="@id/btn_delete"
             app:layout_constraintTop_toTopOf="@+id/tv_title" />
 
@@ -61,7 +61,7 @@
             android:contentDescription="@string/delete_post"
             android:padding="8dp"
             android:src="@drawable/ic_delete"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_body"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_description"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tv_title" />
     </androidx.constraintlayout.widget.ConstraintLayout>

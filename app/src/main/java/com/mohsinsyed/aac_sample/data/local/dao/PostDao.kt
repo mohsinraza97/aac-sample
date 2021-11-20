@@ -1,7 +1,7 @@
-package com.mohsinsyed.aac_sample.data.local
+package com.mohsinsyed.aac_sample.data.local.dao
 
 import androidx.room.*
-import com.mohsinsyed.aac_sample.data.models.Post
+import com.mohsinsyed.aac_sample.data.models.entities.Post
 
 // https://developer.android.com/training/data-storage/room/accessing-data#convenience-insert
 @Dao
@@ -15,17 +15,14 @@ interface PostDao {
     @Update
     suspend fun update(post: Post?): Int?
 
-    @Update
-    suspend fun updateAll(posts: List<Post>?): Int?
-
     @Query("DELETE FROM post where id = :id")
-    suspend fun delete(id: Int?): Int?
+    suspend fun delete(id: Long?): Int?
 
     @Query("DELETE FROM post")
     suspend fun deleteAll(): Int?
 
     @Query("SELECT * FROM post where id = :id")
-    suspend fun findById(id: Int?): Post?
+    suspend fun findById(id: Long?): Post?
 
     @Query("SELECT * FROM post")
     suspend fun findAll(): List<Post>?

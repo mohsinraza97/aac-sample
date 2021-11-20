@@ -8,9 +8,8 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.textfield.TextInputLayout
 import com.mohsinsyed.aac_sample.R
-import com.mohsinsyed.aac_sample.data.models.Post
+import com.mohsinsyed.aac_sample.data.models.entities.Post
 import com.mohsinsyed.aac_sample.data.enums.EditorMode
 import com.mohsinsyed.aac_sample.databinding.FragmentPostEditorBinding
 import com.mohsinsyed.aac_sample.ui.view_models.PostViewModel
@@ -18,6 +17,7 @@ import com.mohsinsyed.aac_sample.utils.constants.AppConstants
 import com.mohsinsyed.aac_sample.utils.extensions.onTextChanged
 import com.mohsinsyed.aac_sample.utils.extensions.setToolBarTitle
 import com.mohsinsyed.aac_sample.utils.extensions.showSnackBar
+import com.mohsinsyed.aac_sample.utils.extensions.toggleError
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -30,7 +30,7 @@ class PostEditorFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_post_editor, container, false)
         return binding?.root
@@ -44,7 +44,7 @@ class PostEditorFragment : Fragment() {
     }
 
     private fun init() {
-        post = arguments?.getSerializable(AppConstants.EXTRA_KEY_POST) as? Post?
+        post = arguments?.getSerializable(AppConstants.IntentConstants.EXTRA_KEY_POST) as? Post?
         val toolbarTitle = if (post == null) {
             mode = EditorMode.ADD
             getString(R.string.add_post)
@@ -55,22 +55,22 @@ class PostEditorFragment : Fragment() {
         setToolBarTitle(toolbarTitle, true)
 
         binding?.etTitle?.setText(post?.title)
-        binding?.etBody?.setText(post?.body)
+        binding?.etDescription?.setText(post?.description)
     }
 
     private fun setListeners() {
-        binding?.etTitle?.onTextChanged { toggleError(binding?.inputLayoutTitle, null) }
-        binding?.etBody?.onTextChanged { toggleError(binding?.inputLayoutBody, null) }
+        binding?.etTitle?.onTextChanged { binding?.inputLayoutTitle?.toggleError() }
+        binding?.etDescription?.onTextChanged { binding?.inputLayoutDescription?.toggleError() }
         binding?.btnCancel?.setOnClickListener { findNavController().popBackStack() }
         binding?.btnSubmit?.setOnClickListener { onSubmit() }
     }
 
     private fun onSubmit() {
         val title = binding?.etTitle?.text?.toString()
-        val body = binding?.etBody?.text?.toString()
+        val description = binding?.etDescription?.text?.toString()
 
-        if (isValid(title, body)) {
-            val p = Post(title = title, body = body)
+        if (isValid(title, description)) {
+            val p = Post(title = title, description = description)
             if (mode == EditorMode.ADD) {
                 postViewModel.create(p)
             } else if (mode == EditorMode.EDIT) {
@@ -83,22 +83,15 @@ class PostEditorFragment : Fragment() {
     private fun isValid(title: String?, body: String?): Boolean {
         var valid = false
         when {
-            title?.isEmpty() == true -> toggleError(
-                binding?.inputLayoutTitle,
-                getString(R.string.error_required)
-            )
-            body?.isEmpty() == true -> toggleError(
-                binding?.inputLayoutBody,
-                getString(R.string.error_required)
-            )
+            title?.isEmpty() == true -> {
+                binding?.inputLayoutTitle?.toggleError(getString(R.string.error_required))
+            }
+            body?.isEmpty() == true -> {
+                binding?.inputLayoutDescription?.toggleError(getString(R.string.error_required))
+            }
             else -> valid = true
         }
         return valid
-    }
-
-    private fun toggleError(inputLayout: TextInputLayout?, message: String?) {
-        inputLayout?.isErrorEnabled = message != null
-        inputLayout?.error = message
     }
 
     private fun setUpObservers() {

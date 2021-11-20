@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.mohsinsyed.aac_sample.data.models.Post
+import com.mohsinsyed.aac_sample.data.models.entities.Post
 import com.mohsinsyed.aac_sample.databinding.ItemPostBinding
 
 // Use ListAdapter with DIFF util for excellent performance!
@@ -60,7 +60,7 @@ class PostAdapter(
             }
 
             binding.tvTitle.text = post?.title
-            binding.tvBody.text = post?.body
+            binding.tvDescription.text = post?.description
         }
     }
 }

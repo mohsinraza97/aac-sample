@@ -3,10 +3,10 @@ package com.mohsinsyed.aac_sample.ui.view_models
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.mohsinsyed.aac_sample.data.models.Post
+import com.mohsinsyed.aac_sample.data.models.entities.Post
 import com.mohsinsyed.aac_sample.data.models.Response
 import com.mohsinsyed.aac_sample.data.repository.PostRepository
-import com.mohsinsyed.aac_sample.utils.utilities.SingleLiveEvent
+import com.mohsinsyed.aac_sample.ui.helpers.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,7 +19,8 @@ class PostViewModel @Inject constructor(
     private val _posts = MutableLiveData<List<Post>?>()
     val posts: LiveData<List<Post>?> get() = _posts
 
-    private val _events = SingleLiveEvent<PostEvents>()
+    private val _events =
+        SingleLiveEvent<PostEvents>()
     val events: LiveData<PostEvents> get() = _events
 
     fun create(post: Post?) {
@@ -48,7 +49,7 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun delete(id: Int?) {
+    fun delete(id: Long?) {
         viewModelScope.launch {
             toggleLoading(true)
             when (val response = repository.delete(id)) {

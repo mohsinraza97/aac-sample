@@ -11,7 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mohsinsyed.aac_sample.R
-import com.mohsinsyed.aac_sample.data.models.Post
+import com.mohsinsyed.aac_sample.data.models.entities.Post
 import com.mohsinsyed.aac_sample.databinding.FragmentPostListBinding
 import com.mohsinsyed.aac_sample.ui.adapters.PostAdapter
 import com.mohsinsyed.aac_sample.ui.view_models.PostViewModel
@@ -92,13 +92,13 @@ class PostListFragment : Fragment() {
     }
 
     private fun onPostClicked(post: Post?) {
-        bundleOf(AppConstants.EXTRA_KEY_POST to post).let {
+        bundleOf(AppConstants.IntentConstants.EXTRA_KEY_POST to post).let {
             navigateTo(R.id.action_post_list_to_post_detail, it)
         }
     }
 
     private fun onEditClicked(post: Post?) {
-        bundleOf(AppConstants.EXTRA_KEY_POST to post).let {
+        bundleOf(AppConstants.IntentConstants.EXTRA_KEY_POST to post).let {
             navigateTo(R.id.action_destination_post_list_to_post_editor, it)
         }
     }

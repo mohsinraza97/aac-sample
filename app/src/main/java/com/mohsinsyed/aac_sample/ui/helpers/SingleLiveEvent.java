@@ -1,4 +1,4 @@
-package com.mohsinsyed.aac_sample.utils.utilities;
+package com.mohsinsyed.aac_sample.ui.helpers;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
@@ -6,6 +6,8 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
+
+import com.mohsinsyed.aac_sample.utils.utilities.LogUtils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -17,7 +19,7 @@ public class SingleLiveEvent<T> extends MutableLiveData<T> {
     @MainThread
     public void observe(@NonNull LifecycleOwner owner, @NonNull Observer<? super T> observer) {
         if (hasActiveObservers()) {
-            AppUtility.debugLog("Multiple observers registered but only one will be notified of changes.");
+            LogUtils.debugLog("Multiple observers registered but only one will be notified of changes.");
         }
         super.observe(owner, t -> {
             if (mPending.compareAndSet(true, false)) {

@@ -4,13 +4,20 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.mohsinsyed.aac_sample.data.models.Post
+import androidx.room.TypeConverters
+import com.mohsinsyed.aac_sample.data.local.converters.TimestampConverter
+import com.mohsinsyed.aac_sample.data.local.dao.OutboxDao
+import com.mohsinsyed.aac_sample.data.local.dao.PostDao
+import com.mohsinsyed.aac_sample.data.models.entities.Outbox
+import com.mohsinsyed.aac_sample.data.models.entities.Post
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants
 
-@Database(entities = [Post::class], version = 1, exportSchema = false)
+@Database(entities = [Post::class, Outbox::class], version = 1, exportSchema = false)
+@TypeConverters(TimestampConverter::class)
 abstract class PostDatabase : RoomDatabase() {
 
     abstract fun postDao(): PostDao
+    abstract fun outboxDao(): OutboxDao
 
     companion object {
         @Volatile

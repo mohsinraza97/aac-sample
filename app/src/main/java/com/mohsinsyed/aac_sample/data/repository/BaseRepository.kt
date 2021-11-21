@@ -22,7 +22,7 @@ open class BaseRepository @Inject constructor(
     @ApplicationContext open val context: Context?,
     open val outboxDao: OutboxDao,
 ) {
-    inline fun <T> sendCoroutineRequest(call: () -> T): Response<T> {
+    inline fun <T> getResponse(call: () -> T): Response<T> {
         return try {
             Response.Success(call())
         } catch (e: HttpException) {
@@ -54,7 +54,7 @@ open class BaseRepository @Inject constructor(
     // region local-data source
     suspend fun addToOutboxWithSyncRequest(value: Any?, tag: String, ) {
         val outboxItem = getOutboxItem(value, tag)
-        val outboxResponse = sendCoroutineRequest { outboxDao.insert(outboxItem) }
+        val outboxResponse = getResponse { outboxDao.insert(outboxItem) }
         if (outboxResponse is Response.Success) {
             LogUtils.debugLog("Added to outbox: $outboxItem")
             context?.let { SyncUtils.createRequest(it, tag) }
@@ -67,7 +67,7 @@ open class BaseRepository @Inject constructor(
     }
 
     suspend fun fetchOutboxPendingRequests(): List<Outbox>? {
-        val dbResponse = sendCoroutineRequest { outboxDao.findByStatus(OUTBOX_STATUS_PENDING, OUTBOX_STATUS_FAILED) }
+        val dbResponse = getResponse { outboxDao.findByStatus(OUTBOX_STATUS_PENDING, OUTBOX_STATUS_FAILED) }
         if (dbResponse is Response.Success) {
             return dbResponse.value
         }

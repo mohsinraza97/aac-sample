@@ -4,11 +4,9 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.mohsinsyed.aac_sample.data.local.dao.OutboxDao
 import com.mohsinsyed.aac_sample.data.models.Response
 import com.mohsinsyed.aac_sample.data.models.entities.Outbox
 import com.mohsinsyed.aac_sample.data.models.entities.Post
-import com.mohsinsyed.aac_sample.data.remote.PostService
 import com.mohsinsyed.aac_sample.data.repository.PostRepository
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants.SyncConstants.SYNC_TAG_CREATE_POST
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants.SyncConstants.SYNC_TAG_DELETE_POST
@@ -43,19 +41,19 @@ class PostWorker @AssistedInject constructor(
                     when {
                         item.tag.equals(SYNC_TAG_CREATE_POST) -> {
                             val post = getPost(item)
-                            repository.sendCoroutineRequest { postService.create(post) }.also {
+                            repository.getResponse { postService.create(post) }.also {
                                 handleResponse(it, item).also { success -> if (success) successCount++ }
                             }
                         }
                         item.tag.equals(SYNC_TAG_UPDATE_POST) -> {
                             val post = getPost(item)
-                            repository.sendCoroutineRequest { postService.update(post, post?.id) }.also {
+                            repository.getResponse { postService.update(post, post?.id) }.also {
                                 handleResponse(it, item).also { success -> if (success) successCount++ }
                             }
                         }
                         item.tag.equals(SYNC_TAG_DELETE_POST) -> {
                             val postId = item.data?.toLongOrNull()
-                            repository.sendCoroutineRequest { postService.delete(postId) }.also {
+                            repository.getResponse { postService.delete(postId) }.also {
                                 handleResponse(it, item).also { success -> if (success) successCount++ }
                             }
                         }
@@ -82,7 +80,7 @@ class PostWorker @AssistedInject constructor(
     ): Boolean {
         repository.outboxDao.apply {
             if (response is Response.Success) {
-                repository.sendCoroutineRequest { delete(item.id) }
+                repository.getResponse { delete(item.id) }
                 return true
             }
         }

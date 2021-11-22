@@ -19,4 +19,4 @@ A simple CRUD application to demonstrate modern android development practices ut
 
 ## Architecture
 * Built with MVVM architecture.
-* Includes android's recommended jetpack libraries for modern development.
+* Includes android recommended jetpack libraries for modern development.

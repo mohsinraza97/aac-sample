@@ -7,5 +7,5 @@ import com.mohsinsyed.aac_sample.utils.constants.AppConstants
 data class Outbox(
     val data: String? = null,
     val tag: String? = null,
-    val status: String?,
+    var status: String?,
 ) : BaseEntity()

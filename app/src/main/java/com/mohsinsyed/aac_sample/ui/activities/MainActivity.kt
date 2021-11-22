@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         })
         postViewModel.uiEvents.observe(this, { event ->
             when (event) {
-                is BaseViewModel.UIEvents.Message -> binding?.root?.showSnackBar(event.message)
+                is BaseViewModel.UIEvents.ShowMessage -> binding?.root?.showSnackBar(event.message)
                 is BaseViewModel.UIEvents.HideKeyboard -> hideKeyboard()
             }
         })

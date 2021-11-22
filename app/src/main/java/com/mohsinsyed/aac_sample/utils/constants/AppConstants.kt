@@ -14,13 +14,11 @@ object AppConstants {
     }
 
     object DBConstants {
-        const val DB_NAME = "AAC_Database"
+        const val DB_NAME = "aac_database.db"
 
         const val OUTBOX_STATUS_PENDING = "PENDING"
         const val OUTBOX_STATUS_IN_PROGRESS = "IN_PROGRESS"
         const val OUTBOX_STATUS_FAILED = "FAILED"
-        const val OUTBOX_STATUS_COMPLETED = "COMPLETED"
-        const val OUTBOX_STATUS_DELETED = "DELETED"
     }
 
     object SyncConstants {

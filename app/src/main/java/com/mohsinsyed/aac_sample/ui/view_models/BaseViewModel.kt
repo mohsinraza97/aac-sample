@@ -12,7 +12,7 @@ open class BaseViewModel : ViewModel() {
 
     private val _uiEvents =
         SingleLiveEvent<UIEvents>()
-    val uiEvents: LiveData<UIEvents> = _uiEvents
+    val uiEvents: LiveData<UIEvents> get() = _uiEvents
 
     protected fun toggleLoading(isLoading: Boolean) {
         _isLoading.value = isLoading
@@ -23,7 +23,7 @@ open class BaseViewModel : ViewModel() {
     }
 
     sealed class UIEvents {
-        data class Message(val message: String?) : UIEvents()
+        data class ShowMessage(val message: String?) : UIEvents()
         object HideKeyboard : UIEvents()
     }
 }

@@ -29,8 +29,7 @@ class PostViewModel @Inject constructor(
             toggleLoading(true)
             when (val response = repository.create(post)) {
                 is Response.Success -> _events.value = PostEvents.Added(response.value)
-                is Response.Error -> setUIEvent(UIEvents.Message(response.message))
-                is Response.Failed -> setUIEvent(UIEvents.Message(response.message))
+                is Response.Error -> setUIEvent(UIEvents.ShowMessage(response.message))
             }
             toggleLoading(false)
         }
@@ -42,8 +41,7 @@ class PostViewModel @Inject constructor(
             toggleLoading(true)
             when (val response = repository.update(post)) {
                 is Response.Success -> _events.value = PostEvents.Updated(response.value)
-                is Response.Error -> setUIEvent(UIEvents.Message(response.message))
-                is Response.Failed -> setUIEvent(UIEvents.Message(response.message))
+                is Response.Error -> setUIEvent(UIEvents.ShowMessage(response.message))
             }
             toggleLoading(false)
         }
@@ -54,8 +52,7 @@ class PostViewModel @Inject constructor(
             toggleLoading(true)
             when (val response = repository.delete(id)) {
                 is Response.Success -> _events.value = PostEvents.Deleted
-                is Response.Error -> setUIEvent(UIEvents.Message(response.message))
-                is Response.Failed -> setUIEvent(UIEvents.Message(response.message))
+                is Response.Error -> setUIEvent(UIEvents.ShowMessage(response.message))
             }
             toggleLoading(false)
         }
@@ -68,7 +65,7 @@ class PostViewModel @Inject constructor(
             }
             when (val response = repository.fetchAll()) {
                 is Response.Success -> _posts.value = response.value
-                is Response.Error -> setUIEvent(UIEvents.Message(response.message))
+                is Response.Error -> setUIEvent(UIEvents.ShowMessage(response.message))
             }
             toggleLoading(false)
         }

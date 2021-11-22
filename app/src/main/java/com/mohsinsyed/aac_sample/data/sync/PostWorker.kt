@@ -4,10 +4,13 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.mohsinsyed.aac_sample.data.local.dao.OutboxDao
 import com.mohsinsyed.aac_sample.data.models.Response
 import com.mohsinsyed.aac_sample.data.models.entities.Outbox
 import com.mohsinsyed.aac_sample.data.models.entities.Post
 import com.mohsinsyed.aac_sample.data.repository.PostRepository
+import com.mohsinsyed.aac_sample.utils.constants.AppConstants.DBConstants.OUTBOX_STATUS_FAILED
+import com.mohsinsyed.aac_sample.utils.constants.AppConstants.DBConstants.OUTBOX_STATUS_IN_PROGRESS
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants.SyncConstants.SYNC_TAG_CREATE_POST
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants.SyncConstants.SYNC_TAG_DELETE_POST
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants.SyncConstants.SYNC_TAG_UPDATE_POST
@@ -30,6 +33,7 @@ class PostWorker @AssistedInject constructor(
         LogUtils.debugLog("Post worker sync initiating...")
         return withContext(Dispatchers.IO) {
             try {
+                val outboxDao = repository.outboxDao
                 val postService = repository.postService
                 val items = repository.fetchOutboxPendingRequests()
 
@@ -37,24 +41,26 @@ class PostWorker @AssistedInject constructor(
                 var successCount = 0
 
                 items?.forEach { item ->
+                    repository.updateOutboxItemStatus(item, OUTBOX_STATUS_IN_PROGRESS)
                     LogUtils.debugLog("Processing: $item")
+
                     when {
                         item.tag.equals(SYNC_TAG_CREATE_POST) -> {
                             val post = getPost(item)
                             repository.getResponse { postService.create(post) }.also {
-                                handleResponse(it, item).also { success -> if (success) successCount++ }
+                                handleResponse(it, outboxDao, item).also { success -> if (success) successCount++ }
                             }
                         }
                         item.tag.equals(SYNC_TAG_UPDATE_POST) -> {
                             val post = getPost(item)
                             repository.getResponse { postService.update(post, post?.id) }.also {
-                                handleResponse(it, item).also { success -> if (success) successCount++ }
+                                handleResponse(it, outboxDao, item).also { success -> if (success) successCount++ }
                             }
                         }
                         item.tag.equals(SYNC_TAG_DELETE_POST) -> {
                             val postId = item.data?.toLongOrNull()
                             repository.getResponse { postService.delete(postId) }.also {
-                                handleResponse(it, item).also { success -> if (success) successCount++ }
+                                handleResponse(it, outboxDao, item).also { success -> if (success) successCount++ }
                             }
                         }
                     }
@@ -76,15 +82,17 @@ class PostWorker @AssistedInject constructor(
 
     private suspend fun <T> handleResponse(
         response: Response<T>,
+        outboxDao: OutboxDao,
         item: Outbox,
     ): Boolean {
-        repository.outboxDao.apply {
-            if (response is Response.Success) {
-                repository.getResponse { delete(item.id) }
-                return true
-            }
+        return if (response is Response.Success) {
+            repository.getResponse { outboxDao.delete(item.id) }
+            true
+        } else {
+            LogUtils.debugLog("Failed to process: $item")
+            repository.updateOutboxItemStatus(item, OUTBOX_STATUS_FAILED)
+            false
         }
-        return false
     }
 
     private fun getPost(item: Outbox) = GsonUtils.fromJson(item.data, Post::class.java)

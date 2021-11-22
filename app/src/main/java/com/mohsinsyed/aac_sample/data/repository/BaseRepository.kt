@@ -51,7 +51,7 @@ open class BaseRepository @Inject constructor(
         }
     }
 
-    // region local-data source
+    // region local data-source
     suspend fun addToOutboxWithSyncRequest(value: Any?, tag: String, ) {
         val outboxItem = getOutboxItem(value, tag)
         val outboxResponse = getResponse { outboxDao.insert(outboxItem) }
@@ -61,17 +61,23 @@ open class BaseRepository @Inject constructor(
         }
     }
 
-    private fun getOutboxItem(value: Any?, tag: String): Outbox {
-        val data = GsonUtils.toJson(value)
-        return Outbox(data, tag, OUTBOX_STATUS_PENDING)
-    }
-
     suspend fun fetchOutboxPendingRequests(): List<Outbox>? {
         val dbResponse = getResponse { outboxDao.findByStatus(OUTBOX_STATUS_PENDING, OUTBOX_STATUS_FAILED) }
         if (dbResponse is Response.Success) {
             return dbResponse.value
         }
         return null
+    }
+
+    suspend fun updateOutboxItemStatus(item: Outbox?, status: String?): Boolean {
+        item?.status = status
+        val dbResponse = getResponse { outboxDao.update(item) }
+        return dbResponse is Response.Success
+    }
+
+    private fun getOutboxItem(value: Any?, tag: String): Outbox {
+        val data = GsonUtils.toJson(value)
+        return Outbox(data, tag, OUTBOX_STATUS_PENDING)
     }
     // endregion
 }

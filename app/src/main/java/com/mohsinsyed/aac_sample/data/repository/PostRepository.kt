@@ -25,7 +25,7 @@ class PostRepository @Inject constructor(
             addToOutboxWithSyncRequest(post, SYNC_TAG_CREATE_POST)
             return getResponse { postDao.findById(dbResponse.value) }
         }
-        return Response.Failed(context?.getString(R.string.general_ui_error))
+        return Response.Error(context?.getString(R.string.general_ui_error))
     }
 
     suspend fun update(post: Post?): Response<Post?> {
@@ -34,7 +34,7 @@ class PostRepository @Inject constructor(
             addToOutboxWithSyncRequest(post, SYNC_TAG_UPDATE_POST)
             return getResponse { postDao.findById(post?.id) }
         }
-        return Response.Failed(context?.getString(R.string.general_ui_error))
+        return Response.Error(context?.getString(R.string.general_ui_error))
     }
 
     suspend fun delete(id: Long?): Response<Unit?> {
@@ -43,7 +43,7 @@ class PostRepository @Inject constructor(
             addToOutboxWithSyncRequest(id, SYNC_TAG_DELETE_POST)
             return Response.Success(Unit)
         }
-        return Response.Failed(context?.getString(R.string.general_ui_error))
+        return Response.Error(context?.getString(R.string.general_ui_error))
     }
 
     suspend fun fetchAll(): Response<List<Post>?> {

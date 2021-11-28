@@ -48,8 +48,8 @@ object AppModule {
         return GsonBuilder().create()
     }
 
-    @Provides
     @Singleton
+    @Provides
     fun provideRetrofit(gson: Gson, client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(AppConstants.NetworkConstants.BASE_URL)
@@ -72,14 +72,14 @@ object AppModule {
         return PostDatabase.getDatabase(context)
     }
 
-    @Provides
     @Singleton
+    @Provides
     fun providePostDao(postDatabase: PostDatabase): PostDao {
         return postDatabase.postDao()
     }
 
-    @Provides
     @Singleton
+    @Provides
     fun provideOutboxDao(postDatabase: PostDatabase): OutboxDao {
         return postDatabase.outboxDao()
     }

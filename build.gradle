@@ -16,7 +16,7 @@ buildscript {
         hilt_compiler_version = "1.0.0"
         hilt_work_version = "1.0.0"
         room_version = "2.3.0"
-        work_version = "2.7.0"
+        work_version = "2.7.1"
         retrofit_version = "2.9.0"
         okhttp3_version = "4.2.1"
         glide_version = "4.11.0"

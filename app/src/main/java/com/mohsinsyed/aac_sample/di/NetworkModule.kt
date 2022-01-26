@@ -1,18 +1,12 @@
 package com.mohsinsyed.aac_sample.di
 
-import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.mohsinsyed.aac_sample.data.local.dao.PostDao
-import com.mohsinsyed.aac_sample.data.local.PostDatabase
-import com.mohsinsyed.aac_sample.data.local.dao.OutboxDao
 import com.mohsinsyed.aac_sample.data.remote.PostService
-import com.mohsinsyed.aac_sample.data.repository.PostRepository
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -23,9 +17,8 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object NetworkModule {
 
-    // region network
     @Singleton
     @Provides
     fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
@@ -63,38 +56,4 @@ object AppModule {
     fun providePostService(retrofit: Retrofit): PostService {
         return retrofit.create(PostService::class.java)
     }
-    // endregion
-
-    // region database
-    @Singleton
-    @Provides
-    fun providePostDatabase(@ApplicationContext context: Context): PostDatabase {
-        return PostDatabase.getDatabase(context)
-    }
-
-    @Singleton
-    @Provides
-    fun providePostDao(postDatabase: PostDatabase): PostDao {
-        return postDatabase.postDao()
-    }
-
-    @Singleton
-    @Provides
-    fun provideOutboxDao(postDatabase: PostDatabase): OutboxDao {
-        return postDatabase.outboxDao()
-    }
-    // endregion
-
-    // region repository
-    @Singleton
-    @Provides
-    fun providePostRepository(
-        @ApplicationContext context: Context,
-        postService: PostService,
-        postDao: PostDao,
-        outboxDao: OutboxDao
-    ): PostRepository {
-        return PostRepository(context, postService, postDao, outboxDao)
-    }
-    // endregion
 }

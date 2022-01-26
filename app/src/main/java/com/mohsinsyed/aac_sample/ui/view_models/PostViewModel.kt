@@ -5,30 +5,36 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.mohsinsyed.aac_sample.data.models.entities.Post
 import com.mohsinsyed.aac_sample.data.models.Response
-import com.mohsinsyed.aac_sample.data.repository.PostRepository
+import com.mohsinsyed.aac_sample.data.repository.outbox.IOutboxRepository
+import com.mohsinsyed.aac_sample.data.repository.outbox.OutboxRepository
+import com.mohsinsyed.aac_sample.data.repository.post.IPostRepository
 import com.mohsinsyed.aac_sample.ui.helpers.SingleLiveEvent
+import com.mohsinsyed.aac_sample.utils.constants.AppConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
-    private val repository: PostRepository,
+    private val postRepository: IPostRepository,
+    private val outboxRepository: IOutboxRepository? = null,
 ) : BaseViewModel() {
 
     private val _posts = MutableLiveData<List<Post>?>()
     val posts: LiveData<List<Post>?> get() = _posts
 
-    private val _events =
-        SingleLiveEvent<PostEvents>()
+    private val _events = SingleLiveEvent<PostEvents>()
     val events: LiveData<PostEvents> get() = _events
 
     fun create(post: Post?) {
         setUIEvent(UIEvents.HideKeyboard)
         viewModelScope.launch {
             toggleLoading(true)
-            when (val response = repository.create(post)) {
-                is Response.Success -> _events.value = PostEvents.Added(response.value)
+            when (val response = postRepository.create(post)) {
+                is Response.Success -> {
+                    _events.value = PostEvents.Added(response.data)
+                    outboxRepository?.add(post, AppConstants.SyncConstants.SYNC_TAG_CREATE_POST)
+                }
                 is Response.Error -> setUIEvent(UIEvents.ShowMessage(response.message))
             }
             toggleLoading(false)
@@ -39,8 +45,11 @@ class PostViewModel @Inject constructor(
         setUIEvent(UIEvents.HideKeyboard)
         viewModelScope.launch {
             toggleLoading(true)
-            when (val response = repository.update(post)) {
-                is Response.Success -> _events.value = PostEvents.Updated(response.value)
+            when (val response = postRepository.update(post)) {
+                is Response.Success -> {
+                    _events.value = PostEvents.Updated(response.data)
+                    outboxRepository?.add(post, AppConstants.SyncConstants.SYNC_TAG_UPDATE_POST)
+                }
                 is Response.Error -> setUIEvent(UIEvents.ShowMessage(response.message))
             }
             toggleLoading(false)
@@ -50,8 +59,11 @@ class PostViewModel @Inject constructor(
     fun delete(id: Long?) {
         viewModelScope.launch {
             toggleLoading(true)
-            when (val response = repository.delete(id)) {
-                is Response.Success -> _events.value = PostEvents.Deleted
+            when (val response = postRepository.delete(id)) {
+                is Response.Success -> {
+                    _events.value = PostEvents.Deleted
+                    outboxRepository?.add(id, AppConstants.SyncConstants.SYNC_TAG_DELETE_POST)
+                }
                 is Response.Error -> setUIEvent(UIEvents.ShowMessage(response.message))
             }
             toggleLoading(false)
@@ -63,8 +75,8 @@ class PostViewModel @Inject constructor(
             if (showLoading) {
                 toggleLoading(true)
             }
-            when (val response = repository.fetchAll()) {
-                is Response.Success -> _posts.value = response.value
+            when (val response = postRepository.fetchAll()) {
+                is Response.Success -> _posts.value = response.data
                 is Response.Error -> setUIEvent(UIEvents.ShowMessage(response.message))
             }
             toggleLoading(false)

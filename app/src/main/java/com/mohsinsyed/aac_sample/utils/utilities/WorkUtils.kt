@@ -2,12 +2,14 @@ package com.mohsinsyed.aac_sample.utils.utilities
 
 import android.content.Context
 import androidx.work.*
-import com.mohsinsyed.aac_sample.data.sync.PostWorker
+import com.mohsinsyed.aac_sample.PostApp
+import com.mohsinsyed.aac_sample.data.workers.PostWorker
 import java.util.concurrent.TimeUnit
 
-object SyncUtils {
+object WorkUtils {
 
-    fun createRequest(context: Context, tag: String) {
+    fun createRequest(tag: String) {
+        val context = PostApp.instance
         val isRunning = isRequestRunning(context, tag)
         if (!isRunning) {
             val constraints = Constraints.Builder()
@@ -23,7 +25,7 @@ object SyncUtils {
             WorkManager.getInstance(context).enqueueUniqueWork(tag,
                 ExistingWorkPolicy.KEEP,
                 request)
-            LogUtils.debugLog("Initiating sync request with tag: $tag")
+            LogUtils.debugLog("Initiating work request[tag= $tag]")
         }
     }
 

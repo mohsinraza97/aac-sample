@@ -1,4 +1,4 @@
-package com.mohsinsyed.aac_sample.data.sync
+package com.mohsinsyed.aac_sample.data.workers
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -8,7 +8,8 @@ import com.mohsinsyed.aac_sample.data.local.dao.OutboxDao
 import com.mohsinsyed.aac_sample.data.models.Response
 import com.mohsinsyed.aac_sample.data.models.entities.Outbox
 import com.mohsinsyed.aac_sample.data.models.entities.Post
-import com.mohsinsyed.aac_sample.data.repository.PostRepository
+import com.mohsinsyed.aac_sample.data.repository.outbox.IOutboxRepository
+import com.mohsinsyed.aac_sample.data.repository.post.IPostRepository
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants.DBConstants.OUTBOX_STATUS_FAILED
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants.DBConstants.OUTBOX_STATUS_IN_PROGRESS
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants.SyncConstants.SYNC_TAG_CREATE_POST
@@ -20,47 +21,44 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.lang.Exception
 
 @HiltWorker
 class PostWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted private val params: WorkerParameters,
-    private val repository: PostRepository,
+    private val postRepository: IPostRepository,
+    private val outboxRepository: IOutboxRepository,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
         LogUtils.debugLog("Post worker sync initiating...")
         return withContext(Dispatchers.IO) {
             try {
-                val outboxDao = repository.outboxDao
-                val postService = repository.postService
-                val items = repository.fetchOutboxPendingRequests()
-
-                LogUtils.debugLog("${items?.size ?: 0} outbox pending items found to sync.")
                 var successCount = 0
+                val items = outboxRepository.getPendingRequests()
+                LogUtils.debugLog("${items?.size ?: 0} outbox pending items found to sync.")
 
                 items?.forEach { item ->
-                    repository.updateOutboxItemStatus(item, OUTBOX_STATUS_IN_PROGRESS)
+                    outboxRepository.updateStatus(item, OUTBOX_STATUS_IN_PROGRESS)
                     LogUtils.debugLog("Processing: $item")
 
                     when {
                         item.tag.equals(SYNC_TAG_CREATE_POST) -> {
                             val post = getPost(item)
-                            repository.getResponse { postService.create(post) }.also {
-                                handleResponse(it, outboxDao, item).also { success -> if (success) successCount++ }
+                            postRepository.create(post, isWorkRequest = true).also {
+                                handleResponse(it, item).also { success -> if (success) successCount++ }
                             }
                         }
                         item.tag.equals(SYNC_TAG_UPDATE_POST) -> {
                             val post = getPost(item)
-                            repository.getResponse { postService.update(post, post?.id) }.also {
-                                handleResponse(it, outboxDao, item).also { success -> if (success) successCount++ }
+                            postRepository.update(post, isWorkRequest = true).also {
+                                handleResponse(it, item).also { success -> if (success) successCount++ }
                             }
                         }
                         item.tag.equals(SYNC_TAG_DELETE_POST) -> {
                             val postId = item.data?.toLongOrNull()
-                            repository.getResponse { postService.delete(postId) }.also {
-                                handleResponse(it, outboxDao, item).also { success -> if (success) successCount++ }
+                            postRepository.delete(postId, isWorkRequest = true).also {
+                                handleResponse(it, item).also { success -> if (success) successCount++ }
                             }
                         }
                     }
@@ -80,17 +78,13 @@ class PostWorker @AssistedInject constructor(
         }
     }
 
-    private suspend fun <T> handleResponse(
-        response: Response<T>,
-        outboxDao: OutboxDao,
-        item: Outbox,
-    ): Boolean {
+    private suspend fun <T> handleResponse(response: Response<T>, item: Outbox): Boolean {
         return if (response is Response.Success) {
-            repository.getResponse { outboxDao.delete(item.id) }
+            outboxRepository.delete(item.id)
             true
         } else {
             LogUtils.debugLog("Failed to process: $item")
-            repository.updateOutboxItemStatus(item, OUTBOX_STATUS_FAILED)
+            outboxRepository.updateStatus(item, OUTBOX_STATUS_FAILED)
             false
         }
     }

@@ -1,16 +1,10 @@
 package com.mohsinsyed.aac_sample.data.repository
 
-import android.content.Context
-import com.mohsinsyed.aac_sample.R
-import com.mohsinsyed.aac_sample.data.local.dao.OutboxDao
 import com.mohsinsyed.aac_sample.data.models.Response
-import com.mohsinsyed.aac_sample.data.models.entities.Outbox
-import com.mohsinsyed.aac_sample.utils.constants.AppConstants.DBConstants.OUTBOX_STATUS_FAILED
-import com.mohsinsyed.aac_sample.utils.constants.AppConstants.DBConstants.OUTBOX_STATUS_PENDING
-import com.mohsinsyed.aac_sample.utils.utilities.GsonUtils
-import com.mohsinsyed.aac_sample.utils.utilities.LogUtils
-import com.mohsinsyed.aac_sample.utils.utilities.SyncUtils
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.mohsinsyed.aac_sample.utils.utilities.StringUtils
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.HttpException
@@ -19,28 +13,28 @@ import java.net.SocketTimeoutException
 import javax.inject.Inject
 
 open class BaseRepository @Inject constructor(
-    @ApplicationContext open val context: Context?,
-    open val outboxDao: OutboxDao,
+    private val stringUtils: StringUtils,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
-    inline fun <T> getResponse(call: () -> T): Response<T> {
-        return try {
+    suspend fun <T> getResponse(call: suspend () -> T): Response<T> = withContext(dispatcher) {
+        return@withContext try {
             Response.Success(call())
         } catch (e: HttpException) {
             val firstMessage = when (e.code()) {
-                in 500..511 -> context?.getString(R.string.error_internal_server)
+                in 500..511 -> stringUtils.internalServerError()
                 else -> getHttpErrorMessage(e)
             }
             Response.Error(firstMessage ?: e.message() ?: e.toString(), e.code())
         } catch (e: SocketTimeoutException) {
-            Response.Error(context?.getString(R.string.error_timeout) ?: e.message ?: e.toString())
+            Response.Error(stringUtils.timeoutError())
         } catch (e: SocketException) {
-            Response.Error(context?.getString(R.string.error_internet) ?: e.message ?: e.toString())
+            Response.Error(stringUtils.noInternetError())
         } catch (e: Exception) {
             Response.Error(e.message ?: e.toString())
         }
     }
 
-    fun getHttpErrorMessage(e: HttpException): String? {
+    private fun getHttpErrorMessage(e: HttpException): String? {
         return try {
             val errorJson = e.response()?.errorBody()?.string()?.let(::JSONObject)
             val errors = errorJson?.getJSONObject("errors")
@@ -50,34 +44,4 @@ open class BaseRepository @Inject constructor(
             null
         }
     }
-
-    // region local data-source
-    suspend fun addToOutboxWithSyncRequest(value: Any?, tag: String, ) {
-        val outboxItem = getOutboxItem(value, tag)
-        val outboxResponse = getResponse { outboxDao.insert(outboxItem) }
-        if (outboxResponse is Response.Success) {
-            LogUtils.debugLog("Added to outbox: $outboxItem")
-            context?.let { SyncUtils.createRequest(it, tag) }
-        }
-    }
-
-    suspend fun fetchOutboxPendingRequests(): List<Outbox>? {
-        val dbResponse = getResponse { outboxDao.findByStatus(OUTBOX_STATUS_PENDING, OUTBOX_STATUS_FAILED) }
-        if (dbResponse is Response.Success) {
-            return dbResponse.value
-        }
-        return null
-    }
-
-    suspend fun updateOutboxItemStatus(item: Outbox?, status: String?): Boolean {
-        item?.status = status
-        val dbResponse = getResponse { outboxDao.update(item) }
-        return dbResponse is Response.Success
-    }
-
-    private fun getOutboxItem(value: Any?, tag: String): Outbox {
-        val data = GsonUtils.toJson(value)
-        return Outbox(data, tag, OUTBOX_STATUS_PENDING)
-    }
-    // endregion
 }

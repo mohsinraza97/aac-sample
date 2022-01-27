@@ -2,7 +2,7 @@ package com.mohsinsyed.aac_sample.di
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.mohsinsyed.aac_sample.data.remote.PostService
+import com.mohsinsyed.aac_sample.data.core.remote.PostService
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants
 import dagger.Module
 import dagger.Provides

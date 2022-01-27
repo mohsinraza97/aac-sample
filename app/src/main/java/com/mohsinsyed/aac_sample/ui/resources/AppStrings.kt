@@ -1,11 +1,11 @@
-package com.mohsinsyed.aac_sample.utils.utilities
+package com.mohsinsyed.aac_sample.ui.resources
 
 import android.app.Application
 import androidx.annotation.StringRes
 import com.mohsinsyed.aac_sample.R
 import javax.inject.Inject
 
-class StringUtils @Inject constructor(
+class AppStrings @Inject constructor(
     private val app: Application,
 ) {
     fun getMessage(@StringRes resId: Int): String = app.getString(resId)

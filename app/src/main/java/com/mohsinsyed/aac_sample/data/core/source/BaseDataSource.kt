@@ -1,7 +1,7 @@
-package com.mohsinsyed.aac_sample.data.repository
+package com.mohsinsyed.aac_sample.data.core.source
 
 import com.mohsinsyed.aac_sample.data.models.Response
-import com.mohsinsyed.aac_sample.utils.utilities.StringUtils
+import com.mohsinsyed.aac_sample.ui.resources.AppStrings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -12,23 +12,23 @@ import java.net.SocketException
 import java.net.SocketTimeoutException
 import javax.inject.Inject
 
-open class BaseRepository @Inject constructor(
-    private val stringUtils: StringUtils,
+open class BaseDataSource @Inject constructor(
+    private val appStrings: AppStrings?,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-) {
-    suspend fun <T> getResponse(call: suspend () -> T): Response<T> = withContext(dispatcher) {
+)  {
+    protected suspend fun <T> getResponse(call: suspend () -> T): Response<T> = withContext(dispatcher) {
         return@withContext try {
             Response.Success(call())
         } catch (e: HttpException) {
             val firstMessage = when (e.code()) {
-                in 500..511 -> stringUtils.internalServerError()
+                in 500..511 -> appStrings?.internalServerError()
                 else -> getHttpErrorMessage(e)
             }
             Response.Error(firstMessage ?: e.message() ?: e.toString(), e.code())
         } catch (e: SocketTimeoutException) {
-            Response.Error(stringUtils.timeoutError())
+            Response.Error(appStrings?.timeoutError())
         } catch (e: SocketException) {
-            Response.Error(stringUtils.noInternetError())
+            Response.Error(appStrings?.noInternetError())
         } catch (e: Exception) {
             Response.Error(e.message ?: e.toString())
         }

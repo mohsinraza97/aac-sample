@@ -1,13 +1,13 @@
-package com.mohsinsyed.aac_sample.data.local
+package com.mohsinsyed.aac_sample.data.core.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.mohsinsyed.aac_sample.data.local.converters.TimestampConverter
-import com.mohsinsyed.aac_sample.data.local.dao.OutboxDao
-import com.mohsinsyed.aac_sample.data.local.dao.PostDao
+import com.mohsinsyed.aac_sample.data.core.local.converters.TimestampConverter
+import com.mohsinsyed.aac_sample.data.core.local.dao.OutboxDao
+import com.mohsinsyed.aac_sample.data.core.local.dao.PostDao
 import com.mohsinsyed.aac_sample.data.models.entities.Outbox
 import com.mohsinsyed.aac_sample.data.models.entities.Post
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants

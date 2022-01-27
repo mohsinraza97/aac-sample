@@ -1,9 +1,9 @@
 package com.mohsinsyed.aac_sample.di
 
 import android.content.Context
-import com.mohsinsyed.aac_sample.data.local.PostDatabase
-import com.mohsinsyed.aac_sample.data.local.dao.OutboxDao
-import com.mohsinsyed.aac_sample.data.local.dao.PostDao
+import com.mohsinsyed.aac_sample.data.core.local.PostDatabase
+import com.mohsinsyed.aac_sample.data.core.local.dao.OutboxDao
+import com.mohsinsyed.aac_sample.data.core.local.dao.PostDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

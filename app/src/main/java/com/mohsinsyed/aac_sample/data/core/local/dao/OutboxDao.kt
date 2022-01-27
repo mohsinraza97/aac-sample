@@ -1,4 +1,4 @@
-package com.mohsinsyed.aac_sample.data.local.dao
+package com.mohsinsyed.aac_sample.data.core.local.dao
 
 import androidx.room.*
 import com.mohsinsyed.aac_sample.data.models.entities.Outbox

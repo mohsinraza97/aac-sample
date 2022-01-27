@@ -4,12 +4,11 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.mohsinsyed.aac_sample.data.local.dao.OutboxDao
+import com.mohsinsyed.aac_sample.data.core.repository.outbox.IOutboxRepository
+import com.mohsinsyed.aac_sample.data.core.source.post.IPostRemoteDataSource
 import com.mohsinsyed.aac_sample.data.models.Response
 import com.mohsinsyed.aac_sample.data.models.entities.Outbox
 import com.mohsinsyed.aac_sample.data.models.entities.Post
-import com.mohsinsyed.aac_sample.data.repository.outbox.IOutboxRepository
-import com.mohsinsyed.aac_sample.data.repository.post.IPostRepository
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants.DBConstants.OUTBOX_STATUS_FAILED
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants.DBConstants.OUTBOX_STATUS_IN_PROGRESS
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants.SyncConstants.SYNC_TAG_CREATE_POST
@@ -26,10 +25,9 @@ import kotlinx.coroutines.withContext
 class PostWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted private val params: WorkerParameters,
-    private val postRepository: IPostRepository,
+    private val postDataSource: IPostRemoteDataSource,
     private val outboxRepository: IOutboxRepository,
 ) : CoroutineWorker(context, params) {
-
     override suspend fun doWork(): Result {
         LogUtils.debugLog("Post worker sync initiating...")
         return withContext(Dispatchers.IO) {
@@ -45,20 +43,26 @@ class PostWorker @AssistedInject constructor(
                     when {
                         item.tag.equals(SYNC_TAG_CREATE_POST) -> {
                             val post = getPost(item)
-                            postRepository.create(post, isWorkRequest = true).also {
-                                handleResponse(it, item).also { success -> if (success) successCount++ }
+                            postDataSource.create(post).also {
+                                handleResponse(it, item).also { success ->
+                                    if (success) successCount++
+                                }
                             }
                         }
                         item.tag.equals(SYNC_TAG_UPDATE_POST) -> {
                             val post = getPost(item)
-                            postRepository.update(post, isWorkRequest = true).also {
-                                handleResponse(it, item).also { success -> if (success) successCount++ }
+                            postDataSource.update(post).also {
+                                handleResponse(it, item).also { success ->
+                                    if (success) successCount++
+                                }
                             }
                         }
                         item.tag.equals(SYNC_TAG_DELETE_POST) -> {
                             val postId = item.data?.toLongOrNull()
-                            postRepository.delete(postId, isWorkRequest = true).also {
-                                handleResponse(it, item).also { success -> if (success) successCount++ }
+                            postDataSource.delete(postId).also {
+                                handleResponse(it, item).also { success ->
+                                    if (success) successCount++
+                                }
                             }
                         }
                     }

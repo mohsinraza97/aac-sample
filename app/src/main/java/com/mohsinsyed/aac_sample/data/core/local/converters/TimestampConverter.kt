@@ -1,4 +1,4 @@
-package com.mohsinsyed.aac_sample.data.local.converters
+package com.mohsinsyed.aac_sample.data.core.local.converters
 
 import androidx.room.TypeConverter
 import java.util.*

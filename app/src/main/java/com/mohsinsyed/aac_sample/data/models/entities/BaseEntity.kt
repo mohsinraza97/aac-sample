@@ -4,7 +4,7 @@ import androidx.room.PrimaryKey
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.TypeConverters
-import com.mohsinsyed.aac_sample.data.local.converters.TimestampConverter
+import com.mohsinsyed.aac_sample.data.core.local.converters.TimestampConverter
 import java.io.Serializable
 import java.util.*
 

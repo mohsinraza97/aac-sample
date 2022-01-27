@@ -1,4 +1,4 @@
-package com.mohsinsyed.aac_sample.data.remote
+package com.mohsinsyed.aac_sample.data.core.remote
 
 import com.mohsinsyed.aac_sample.data.models.entities.Post
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants

@@ -1,38 +1,45 @@
-package com.mohsinsyed.aac_sample.data.repository.outbox
+package com.mohsinsyed.aac_sample.data.core.source.outbox
 
-import android.content.Context
-import com.mohsinsyed.aac_sample.data.local.dao.OutboxDao
+import com.mohsinsyed.aac_sample.data.core.local.dao.OutboxDao
+import com.mohsinsyed.aac_sample.data.core.source.BaseDataSource
 import com.mohsinsyed.aac_sample.data.models.Response
 import com.mohsinsyed.aac_sample.data.models.entities.Outbox
-import com.mohsinsyed.aac_sample.data.repository.BaseRepository
+import com.mohsinsyed.aac_sample.ui.resources.AppStrings
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants.DBConstants.OUTBOX_STATUS_FAILED
 import com.mohsinsyed.aac_sample.utils.constants.AppConstants.DBConstants.OUTBOX_STATUS_PENDING
 import com.mohsinsyed.aac_sample.utils.utilities.GsonUtils
 import com.mohsinsyed.aac_sample.utils.utilities.LogUtils
-import com.mohsinsyed.aac_sample.utils.utilities.StringUtils
 import com.mohsinsyed.aac_sample.utils.utilities.WorkUtils
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
-class OutboxRepository @Inject constructor(
-    private val stringUtils: StringUtils,
-    private val outboxDao: OutboxDao,
+interface IOutboxDataSource {
+    suspend fun add(value: Any?, tag: String): Boolean
+    suspend fun getPendingRequests(): List<Outbox>?
+    suspend fun updateStatus(item: Outbox?, status: String?): Boolean
+    suspend fun delete(id: Long?): Boolean
+}
+
+class OutboxDataSource @Inject constructor(
+    private val dao: OutboxDao,
+    appStrings: AppStrings?,
     dispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : BaseRepository(stringUtils, dispatcher), IOutboxRepository {
-    override suspend fun add(value: Any?, tag: String): Response<Long?> {
+) : BaseDataSource(appStrings, dispatcher), IOutboxDataSource {
+    override suspend fun add(value: Any?, tag: String): Boolean {
         val outboxItem = getNewOutboxItem(value, tag)
-        val dbResponse = getResponse { outboxDao.insert(outboxItem) }
+        val dbResponse = getResponse { dao.insert(outboxItem) }
         if (dbResponse is Response.Success) {
             LogUtils.debugLog("Added to outbox: $outboxItem")
             WorkUtils.createRequest(tag)
+            return true
         }
-        return dbResponse
+        return false
     }
 
     override suspend fun getPendingRequests(): List<Outbox>? {
         val dbResponse = getResponse {
-            outboxDao.findByStatus(OUTBOX_STATUS_PENDING, OUTBOX_STATUS_FAILED)
+            dao.findByStatus(OUTBOX_STATUS_PENDING, OUTBOX_STATUS_FAILED)
         }
         if (dbResponse is Response.Success) {
             return dbResponse.data
@@ -42,12 +49,12 @@ class OutboxRepository @Inject constructor(
 
     override suspend fun updateStatus(item: Outbox?, status: String?): Boolean {
         item?.status = status
-        val dbResponse = getResponse { outboxDao.update(item) }
+        val dbResponse = getResponse { dao.update(item) }
         return dbResponse is Response.Success
     }
 
     override suspend fun delete(id: Long?): Boolean {
-        val dbResponse = getResponse { outboxDao.delete(id) }
+        val dbResponse = getResponse { dao.delete(id) }
         return dbResponse is Response.Success
     }
 

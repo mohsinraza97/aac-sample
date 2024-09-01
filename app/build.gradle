@@ -1,19 +1,23 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'kotlin-android-extensions'
+    id 'kotlin-parcelize'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
     id 'androidx.navigation.safeargs.kotlin'
 }
 
+kapt {
+    correctErrorTypes = true
+}
+
 android {
-    compileSdk 31
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.mohsinsyed.aac_sample"
-        minSdk 21
-        targetSdk 31
+        minSdk 23
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -28,16 +32,23 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = "17"
     }
 
     buildFeatures {
         dataBinding true
+    }
+    namespace 'com.mohsinsyed.aac_sample'
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = "17"
     }
 }
 
